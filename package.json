@@ -9,5 +9,8 @@
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.11.2"
   },
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "dependencies": {
+    "pdfjs-dist": "^2.9.359"
+  }
 }

@@ -1,6 +1,9 @@
 module App
 
 open Browser.Dom
+open Fable.Core.JsInterop
+
+let globalWorkerOptions: unit -> unit = importMember "pdfjs-dist/lib/pdf"
 
 // Mutable variable to count the number of times we clicked the button
 let mutable count = 0

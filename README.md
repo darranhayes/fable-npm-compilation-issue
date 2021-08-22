@@ -1,37 +1,38 @@
-# Fable Minimal App
+# Fable compiler errors with NPM dependences
 
-This is a small Fable app project so you can easily get started and add your own code progressively. For more comprehensive templates [check this page](https://fable.io/docs/2-steps/your-first-fable-project.html).
+Trying to use <https://github.com/mozilla/pdfjs-dist> via <https://github.com/agentcooper/react-pdf-highlighter> and immediately encountered compilations errors with Fable.
 
-## Requirements
+## Steps to recreate bug with new repo
 
-* [dotnet SDK](https://www.microsoft.com/net/download/core) 5.0 or higher
-* [node.js](https://nodejs.org)
-* An F# editor like Visual Studio, Visual Studio Code with [Ionide](http://ionide.io/) or [JetBrains Rider](https://www.jetbrains.com/rider/)
+1. dotnet new fable
+2. dotnet tool restore
+3. npm install pdfjs-dist
+4. App.fs, take any dependency from the pdfjs-dist module, e.g.,
+```
+open Fable.Core.JsInterop
+let globalWorkerOptions: unit -> unit = importMember "pdfjs-dist/lib/pdf"
+```
+5. npm run start
+6. Observe multiple compilation errors, failing to handle npm dependencies due to not supporting optional-chaining syntax "?." <https://babeljs.io/docs/en/babel-plugin-proposal-optional-chaining>
 
-## Building and running the app
+## Recreate bug with this repo
+1. npm install
+2. npm run start
 
-* Install dependencies: `npm install`
-* Start the compiler in watch mode and a development server: `npm start`
-* After the first compilation is finished, in your browser open: http://localhost:8080/
-
-Any modification you do to the F# code will be reflected in the web page after saving.
-
-> Note: check the "scripts" section in `package.json` to see the commands triggered by the steps above.
-
-## Project structure
-
-### npm
-
-JS dependencies are declared in `package.json`, while `package-lock.json` is a lock file automatically generated.
-
-### Webpack
-
-[Webpack](https://webpack.js.org) is a JS bundler with extensions, like a static dev server that enables hot reloading on code changes. Configuration for Webpack is defined in the `webpack.config.js` file. Note this sample only includes basic Webpack configuration for development mode, if you want to see a more comprehensive configuration check the [Fable webpack-config-template](https://github.com/fable-compiler/webpack-config-template/blob/master/webpack.config.js).
-
-### F#
-
-The sample only contains two F# files: the project (.fsproj) and a source file (.fs) in the `src` folder.
-
-### Web assets
-
-The `index.html` file and other assets like an icon can be found in the `public` folder.
+## Compilation errors on ?. syntax
+```
+ERROR in ./node_modules/pdfjs-dist/lib/display/annotation_layer.js 366:34
+Module parse failed: Unexpected token (366:34)
+You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
+|
+|       link[jsName] = () => {
+>         this.linkService.eventBus?.dispatch("dispatcheventinsandbox", {
+|           source: this,
+|           detail: {
+ @ ./node_modules/pdfjs-dist/lib/pdf.js 244:24-64
+ @ ./src/App.fs.js
+```
+## Versions
+- Fable: F# to JS compiler 3.2.9
+- Node v14.15.1
+- Windows 10
